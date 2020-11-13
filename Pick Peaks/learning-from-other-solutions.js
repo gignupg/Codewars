@@ -16,4 +16,4 @@ function pickPeaks(arr) {
     return result;
 }
 
-console.log("result:", pickPeaks([1, 2, 1]));
+console.log("result:", pickPeaks([3, 2, 3, 6, 4, 1, 0, 3, 2, 1, 2, 3]));
