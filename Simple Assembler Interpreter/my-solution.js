@@ -1,33 +1,26 @@
+const { PerformanceObserver, performance } = require('perf_hooks');
+
+// Try saving everything in variables instead of an object!
+
 function simple_assembler(program) {
+    const timestamp = performance.now();
     const input = program.map(command => command.split(" "));
     const regs = {};
-
-    function interpreter([command, x, y = null]) {
-        switch (command) {
-            case "mov": regs[x] = regs[y] || Number(y); break;
-            case "inc": regs[x]++; break;
-            case "dec": regs[x]--; break;
-            case "jnz": return regs[x] !== 0 ? y : null;
-        }
-    }
+    let incI = true;
 
     for (let i = 0; i < input.length;) {
-        const action = interpreter(input[i]);
-        action ? i += Number(action) : i++;
+        switch (input[i][0]) {
+            case "mov": regs[input[i][1]] = regs[input[i][2]] || Number(input[i][2]); break;
+            case "inc": regs[input[i][1]] += 1; break;
+            case "dec": regs[input[i][1]] -= 1; break;
+            case "jnz": regs[input[i][1]] !== 0 ? incI = false : null;
+        }
+        incI ? i++ : i += Number(input[i][2]); incI = true;
     }
 
+    console.log(performance.now() - timestamp);
     return regs;
 }
-
-
-
-
-
-
-
-
-
-
 
 console.log(simple_assembler([
     'mov a 1',  // 01
@@ -43,7 +36,7 @@ console.log(simple_assembler([
     'mov c a',  // 07  // 14  // 21         //
     'inc a',    // 08  // 15  // 22  // 25  //  //  //  //
     'dec b',    // 09  // 16  // 23  // 26  //  //  //  //
-    'jnz b -2', // 10  // 17  // 24  // 27  //  //  //  // 
+    'jnz b -2', // 10  // 17  // 24  // 27  //  //  //  //
     'mov b c',  // 11  // 18         //                 //
     'dec d',    // 12  // 19         //                 //
     'jnz d -6', // 13  // 20         //                 //
