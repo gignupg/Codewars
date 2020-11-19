@@ -138,9 +138,9 @@ permutations('abcd');
 // {1: [], 2: [], 3: [], 4:}
 
 
-// 2 - 6 -24 -120
-// 1 - 2 - 6 - 24
-// 2 - 3 - 4 -  5
+// 1 - 2 - 6 -24 -120
+// 1 - 1 - 2 - 6 - 24
+// 1 - 2 - 3 - 4 -  5
 
 // Task: 4 different letters how many times can each letter be in position 1?
 
@@ -148,9 +148,85 @@ permutations('abcd');
 
 // for (let i = 2; i <= 4; i++) {
 
-// abcd
-// abdc
-// acbd
-// acdb
-// adbc
-// adcb
+// abcd | length = 4 => duration 6 cycles before changing the order.
+// p4 a | Stays the same 6 times (in this case throughout the whole lifecycle of this order).
+// p3 b | Stays the same 2 times
+// p2 c | Stays the same 1 time
+// p1 d | Stays the same 1 time
+
+// p4 changes after 6 r
+// p3 changes after 2 r
+// p2 changes after 1 r
+// p1 changes after 1 r
+
+// p1 is never moved!
+
+// abcde -> p2 end
+// abced -> p2 end & p3 end
+// abdec -> p2 end
+// abdce -> p2 end & p3 end
+// abecd -> p2 end
+// abedc -> p2 end & p3 end & p4 end
+
+// acdeb -> p2 end
+// acdbe -> p2 end & p3 end
+// acebd -> p2 end
+// acedb -> p2 end & p3 end
+// acbde -> p2 end
+// acbed -> p2 end & p3 end & p4 end
+
+// adebc -> end
+// adecb -> p2 end & p3 end
+// adbce -> p2 end
+// adbec -> p2 end & p3 end
+// adceb -> p2 end
+// adcbe -> p2 end & p3 end & p4 end
+
+// aebcd -> end
+// aebdc -> p2 end & p3 end
+// aecdb -> p2 end
+// aecbd -> p2 end & p3 end
+// aedbc -> p2 end
+// aedcb -> p2 end & p3 end & p4 end
+
+// bcdea...
+// It works, I've found THE algorithm
+
+//   621
+// 0 abcd -> move p2 to the right
+//   511
+// 1 abdc -> move p3 to the right & move p2 to the right  
+//   421
+// 2 acdb -> move p2 to the right
+//   311
+// 3 acbd -> move p3 to the right & move p2 to the right  
+//   221
+// 4 abcd -> move p2 to the right
+//   121
+
+// string = "abcd"
+
+// string = p4 + p3 + p2 + p1
+// string = p4 + p3 + p2 + p1
+
+// p4 = a 
+
+// const resultArr = []
+
+// for (let i = 0; i < n; i++) {
+
+      // We must have an array that contains all possible string values
+//    for (let r = 0; r < 6; r++) {
+//       6 * p4/a  | 2 * p3/b  | 1 * p2/c | 1* p1/d
+//    }
+
+// }
+
+
+
+
+
+
+
+
+
