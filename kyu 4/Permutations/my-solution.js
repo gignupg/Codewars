@@ -1,87 +1,39 @@
-function fillingArrWithChars(string, n, charsPerPos) {
-    const fullArr = [];
-    const preparationArr = [];
-
-    for (let i = 0; i < n; i++) {
-        preparationArr.push({ letter: string[i], amount: charsPerPos });
-    }
-    for (let i = 0; i < n; i++) {
-        fullArr.push(JSON.parse(JSON.stringify(preparationArr)));
-    }
-
-    return fullArr;
-}
-
-function generateAllCombinations(fullArr, n, charsPerPos) {
-    const resultArr = [];
-    const totalChars = n * charsPerPos;
-
-    for (let i = 0; i < totalChars; i++) {
-        let newStrCombo = "";
-        const usedCharPos = [];
-
-        if (i >= 0) {
-            console.log("||| New i |||", i)
-            console.log("Snapshot:");
-            console.log(fullArr);
-            console.log("Array so far:");
-            console.log(resultArr);
-        }
-
-        // Looping through each character position
-        for (let j = 0; j < n; j++) {
-            const arr = fullArr[j];
-            const score = [];       // Give each obj a score, then push the obj with the highest score!
-
-            // Looping through each possible character for each position (j), then choosing one character.
-            for (let k = 0; k < n; k++) {
-
-                if (usedCharPos.includes(k)) {
-                    score.push(0);
-
-                } else {
-                    score.push(arr[k].amount);
-                }
-            };
-
-            // Find the next letter
-            if (score.length) {
-                const highestScore = [...score].sort((a, b) => b - a)[0];
-                const highScorePos = score.indexOf(highestScore);
-                const obj = arr[highScorePos];
-
-                // if (i >= 0 && i <= 1) {
-                //     console.log("score", score)
-                //     console.log("highestScore", highestScore)
-                //     console.log("highScorePos", highScorePos)
-                //     console.log("obj", obj)
-                //     console.log("-----------------------------")
-                // }
-
-                newStrCombo += obj.letter;
-                obj.amount--;
-                usedCharPos.push(highScorePos);
-            }
-        };
-        resultArr.push(newStrCombo);
-    }
-    return resultArr;
-}
-
-
 function permutations(string) {
     const n = string.length;
 
+    if (n === 0) return [];
     if (n === 1) return [string];
 
-    // Calculate the amount of times a letter re-appears at the same position
+    // Calculate the amount of times a letter re-appears at the same position and save it in switchArr
+    // switchArr should look like this 2,6,24,120... up to n
+    const switchArr = [0];
     let charsPerPos = 1;
-    for (let i = 2; i < n; i++) {
+    for (let i = 1; i <= n; i++) {
         charsPerPos *= i;
+        switchArr.push(charsPerPos);
     }
 
-    const fullArr = fillingArrWithChars(string, n, charsPerPos);
-    const resultArr = generateAllCombinations(fullArr, n, charsPerPos);
+    const totalRuns = switchArr.pop();
+
+    // This array will include all results. There may or may not be duplicates in it. Depending on whether "string" contains only unique characters or not.
+    const resultArr = [];
+    const strArr = string.split("");
+
+    // The main part. Calculating all possible combinations.
+    for (let i = 1; i <= totalRuns; i++) {
+        resultArr.push(strArr.join(""));
+
+        // Rearranging the string.
+        // look at the char right. Calculate with i and switchArr[j] whether or not to move it!
+        for (let j = 0; j < n; j++) {
+            const switchNum = switchArr[j];
+
+            if (i % switchNum === 0) {
+                const end = strArr.splice((n - 1 - j), 1);
+                strArr.push(...end);
+            }
+        }
+    }
 
     // Getting rid of duplicates before returning. 
     return [...new Set(resultArr)];
@@ -91,51 +43,11 @@ function permutations(string) {
 // ['ab', 'ba']
 // permutations('abc');
 // ['abc', 'bac'...]
-permutations('abcd');
+console.log(permutations('abcd'))
 // ['abcd', 'bacd'...]
 // console.log(permutations('aabb'));
 // ['aabb', 'abab', 'abba', 'baab', 'baba', 'bbaa']
 
-
-// Thought process
-
-// Choosing the right structure:
-// [
-//   [{letter: "a", amount: 2}, {letter: "b", amount: 2}, {letter: "c", amount: 2}],
-//   [{letter: "a", amount: 2}, {letter: "b", amount: 2}, {letter: "c", amount: 2}],
-//   [{letter: "a", amount: 2}, {letter: "b", amount: 2}, {letter: "c", amount: 2}]
-// ]
-
-// Full Object
-// {1: [a,a,b,b,c,c], 2: [a,a,b,b,c,c], 3: [a,a,b,b,c,c]}
-// {1: [a,b,b,c,c], 2: [a,a,b,c,c], 3: [a,a,b,b,c]}
-// {1: [a,b,c,c], 2: [a,b,c,c], 3: [a,a,b,b]}
-// {1: [a,b,c], 2: [b,c,c], 3: [a,a,b]}
-// {1: [b,c], 2: [b,c], 3: [a,a]}
-// {1: [c], 2: [b], 3: [a]}
-// {1: [], 2: [], 3: []}
-
-// Empty Object
-// {1: [], 2: [], 3: []}
-// {1: [a], 2: [b], 3: [c]}
-// {1: [a,b], 2: [b,a], 3: [c,c]}
-// {1: [a,b,c], 2: [b,a,a], 3: [c,c,b]}
-// {1: [a,b,c,a], 2: [b,a,a,c], 3: [c,c,b,b]}
-// {1: [a,b,c,a,b], 2: [b,a,a,c,c], 3: [c,c,b,b,a]}
-// {1: [a,b,c,a,b,c], 2: [b,a,a,c,c,b], 3: [c,c,b,b,a,a]}
-
-
-// a b c d
-// 
-
-
-// Let's see if there is a pattern: The same thing but with 4
-
-// Full Object
-// {1: [a,a,a,a,a,a,b,b,b,b,b,b,c,c,c,c,c,c], 2: [a,a,a,a,a,a,b,b,b,b,b,b,c,c,c,c,c,c], 3: [a,a,a,a,a,a,b,b,b,b,b,b,c,c,c,c,c,c], 4: [a,a,a,a,a,a,b,b,b,b,b,b,c,c,c,c,c,c]}
-
-// Empty Object
-// {1: [], 2: [], 3: [], 4:}
 
 
 // 1 - 2 - 6 -24 -120
@@ -223,10 +135,37 @@ permutations('abcd');
 // }
 
 
+// How I tried to solve it at first
 
+// Choosing the right structure:
+// [
+//   [{letter: "a", amount: 2}, {letter: "b", amount: 2}, {letter: "c", amount: 2}],
+//   [{letter: "a", amount: 2}, {letter: "b", amount: 2}, {letter: "c", amount: 2}],
+//   [{letter: "a", amount: 2}, {letter: "b", amount: 2}, {letter: "c", amount: 2}]
+// ]
 
+// Full Object
+// {1: [a,a,b,b,c,c], 2: [a,a,b,b,c,c], 3: [a,a,b,b,c,c]}
+// {1: [a,b,b,c,c], 2: [a,a,b,c,c], 3: [a,a,b,b,c]}
+// {1: [a,b,c,c], 2: [a,b,c,c], 3: [a,a,b,b]}
+// {1: [a,b,c], 2: [b,c,c], 3: [a,a,b]}
+// {1: [b,c], 2: [b,c], 3: [a,a]}
+// {1: [c], 2: [b], 3: [a]}
+// {1: [], 2: [], 3: []}
 
+// Empty Object
+// {1: [], 2: [], 3: []}
+// {1: [a], 2: [b], 3: [c]}
+// {1: [a,b], 2: [b,a], 3: [c,c]}
+// {1: [a,b,c], 2: [b,a,a], 3: [c,c,b]}
+// {1: [a,b,c,a], 2: [b,a,a,c], 3: [c,c,b,b]}
+// {1: [a,b,c,a,b], 2: [b,a,a,c,c], 3: [c,c,b,b,a]}
+// {1: [a,b,c,a,b,c], 2: [b,a,a,c,c,b], 3: [c,c,b,b,a,a]}
 
+// Let's see if there is a pattern: The same thing but with 4
 
+// Full Object
+// {1: [a,a,a,a,a,a,b,b,b,b,b,b,c,c,c,c,c,c], 2: [a,a,a,a,a,a,b,b,b,b,b,b,c,c,c,c,c,c], 3: [a,a,a,a,a,a,b,b,b,b,b,b,c,c,c,c,c,c], 4: [a,a,a,a,a,a,b,b,b,b,b,b,c,c,c,c,c,c]}
 
-
+// Empty Object
+// {1: [], 2: [], 3: [], 4:}
